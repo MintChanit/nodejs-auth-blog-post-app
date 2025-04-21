@@ -1,19 +1,35 @@
 import { useState } from "react";
+import { useAuth } from "../contexts/authentication";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { login, state } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // 🐨 Todo: Exercise #4
-    //  นำ Function `login` ใน AuthContext มา Execute ใน Event Handler ตรงนี้
+    setError("");
+    
+    const result = await login(username, password);
+    
+    if (result.success) {
+      console.log("Login successful:", result.data);
+      navigate("/");
+    } else {
+      console.error("Error during login:", result.error);
+      setError(result.error);
+    }
   };
 
   return (
     <div className="login-form-container">
       <form className="login-form" onSubmit={handleSubmit}>
         <h1>Login Page</h1>
+        {error && <div className="error-message">{error}</div>}
+        {state.loading && <div>Loading...</div>}
         <div className="input-container">
           <label>
             Username
@@ -46,7 +62,7 @@ function LoginPage() {
         </div>
 
         <div className="form-actions">
-          <button type="submit">Login</button>
+          <button type="submit" disabled={state.loading}>Login</button>
         </div>
       </form>
     </div>

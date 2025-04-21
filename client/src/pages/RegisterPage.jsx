@@ -1,21 +1,37 @@
 import { useState } from "react";
+import { useAuth } from "../contexts/authentication";
+import { useNavigate } from "react-router-dom";
 
 function RegisterPage() {
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { register, state } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // 🐨 Todo: Exercise #2
-    // นำ Function `register` ใน AuthContext มา Execute ใน Event Handler ตรงนี้
+    setError("");
+    
+    const result = await register(username, password, firstName, lastName);
+    
+    if (result.success) {
+      console.log("Registration successful:", result.data);
+      navigate("/login");
+    } else {
+      console.error("Error during registration:", result.error);
+      setError(result.error);
+    }
   };
 
   return (
     <div className="register-form-container">
       <form className="register-form" onSubmit={handleSubmit}>
         <h1>Register Form</h1>
+        {error && <div className="error-message">{error}</div>}
+        {state.loading && <div>Loading...</div>}
         <div className="input-container">
           <label>
             Username
@@ -37,7 +53,7 @@ function RegisterPage() {
             <input
               id="password"
               name="password"
-              type="text"
+              type="password"
               placeholder="Enter password here"
               onChange={(event) => {
                 setPassword(event.target.value);
@@ -77,7 +93,7 @@ function RegisterPage() {
           </label>
         </div>
         <div className="form-actions">
-          <button type="submit">Submit</button>
+          <button type="submit" disabled={state.loading}>Submit</button>
         </div>
       </form>
     </div>
