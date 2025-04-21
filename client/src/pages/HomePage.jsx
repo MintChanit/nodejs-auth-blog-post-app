@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 import usePosts from "../hooks/usePosts";
 import getPublishedDate from "../utils/getPublishedDate";
+import { useAuth } from "../contexts/authentication";
 
 function HomePage() {
+  const {logout} = useAuth()
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("");
@@ -27,11 +29,9 @@ function HomePage() {
         >
           Create Post
         </button>
-        {/* 
-           // 🐨 Todo: Exercise #7
-          //  นำ Function `logout` จาก AuthContext มา Execute ใน Prop `onClick`
-        */}
-        <button>Logout</button>
+        <button onClick={()=> {
+          logout()
+        }}>Logout</button>
       </div>
       <div className="search-box-container">
         <div className="search-box">
